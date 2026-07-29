@@ -1,0 +1,11 @@
+# Core data generation
+numpy>=1.26
+
+# Local exploration / validation (query the CSVs with pandas or SQL via DuckDB)
+pandas>=2.0
+duckdb>=1.0
+
+# --- Added in later phases ---
+# dbt-core>=1.7
+# dbt-snowflake>=1.7
+# apache-airflow>=2.8
