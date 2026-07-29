@@ -1,0 +1,18 @@
+version: 2
+
+# Declares the raw bronze tables (loaded from S3 via COPY INTO) as dbt "sources".
+# Staging models read from these with {{ source('bronze', '<table>') }}.
+sources:
+  - name: bronze
+    database: FRAUD_DB
+    schema: BRONZE
+    description: "Raw multi-rail transactions landed from the S3 bronze layer, one table per payment rail."
+    tables:
+      - name: ach_transactions
+        description: "Raw ACH transactions (debit/credit, SEC codes, NACHA return codes)."
+      - name: wire_transactions
+        description: "Raw wire transactions (domestic/international, beneficiary detail)."
+      - name: rtp_transactions
+        description: "Raw instant (RTP) transactions (device/IP, recipient novelty)."
+      - name: card_transactions
+        description: "Raw card transactions (entry mode, AVS/CVV, merchant geography)."

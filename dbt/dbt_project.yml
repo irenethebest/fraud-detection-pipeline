@@ -1,0 +1,28 @@
+# dbt project config. dbt Cloud reads this from GitHub (project subdirectory = dbt).
+name: 'fraud_pipeline'
+version: '1.0.0'
+config-version: 2
+
+# The connection profile. dbt Cloud supplies the real connection via its UI, so
+# this name just needs to exist; it isn't where credentials live.
+profile: 'fraud_pipeline'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Materialization strategy per layer (medallion):
+#   staging (silver) -> views  (lightweight, always fresh)
+#   marts   (gold)   -> tables (materialized for fast reads / BI)
+models:
+  fraud_pipeline:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

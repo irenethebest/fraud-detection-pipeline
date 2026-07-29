@@ -1,0 +1,72 @@
+version: 2
+
+# Tests run with `dbt test`. They turn data-quality assumptions into automated
+# checks -- e.g. the `unique` test on transaction_id below would have caught the
+# duplicate-file over-count we hit while loading bronze.
+models:
+  - name: stg_transactions
+    description: "All four rails standardized into one common schema (silver keystone)."
+    columns:
+      - name: transaction_id
+        description: "Globally unique transaction identifier."
+        tests:
+          - unique
+          - not_null
+      - name: rail_type
+        description: "Payment rail."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ACH', 'WIRE', 'RTP', 'CARD']
+      - name: amount
+        tests:
+          - not_null
+      - name: is_fraud
+        description: "Ground-truth fraud label (validation only)."
+        tests:
+          - not_null
+
+  - name: stg_ach
+    description: "Cleaned ACH transactions."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: direction
+        description: "debit (pull) or credit (push)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['debit', 'credit']
+      - name: sec_code
+        tests:
+          - accepted_values:
+              values: ['PPD', 'CCD', 'WEB', 'TEL']
+
+  - name: stg_wire
+    description: "Cleaned wire transactions."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: wire_type
+        tests:
+          - accepted_values:
+              values: ['domestic', 'international']
+
+  - name: stg_rtp
+    description: "Cleaned instant (RTP) transactions."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: hour_of_day
+        tests:
+          - not_null
+
+  - name: stg_card
+    description: "Cleaned card transactions."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: entry_mode
+        tests:
+          - accepted_values:
+              values: ['chip', 'swipe', 'contactless', 'card_not_present']
