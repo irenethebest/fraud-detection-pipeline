@@ -1,8 +1,12 @@
 version: 2
 
-# Tests run with `dbt test`. They turn data-quality assumptions into automated
-# checks -- e.g. the `unique` test on transaction_id below would have caught the
-# duplicate-file over-count we hit while loading bronze.
+# Tests run with `dbt test` (and as part of `dbt build`). They turn data-quality
+# assumptions into automated checks -- e.g. the `unique` test on transaction_id
+# below would have caught the duplicate-file over-count we hit loading bronze.
+#
+# NOTE ON SYNTAX: newer dbt requires a generic test's inputs to sit under an
+# `arguments:` key (e.g. accepted_values -> arguments -> values). The plain
+# `unique` / `not_null` tests take no inputs, so they stay as-is.
 models:
   - name: stg_transactions
     description: "All four rails standardized into one common schema (silver keystone)."
@@ -17,7 +21,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['ACH', 'WIRE', 'RTP', 'CARD']
+              arguments:
+                values: ['ACH', 'WIRE', 'RTP', 'CARD']
       - name: amount
         tests:
           - not_null
@@ -36,11 +41,13 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['debit', 'credit']
+              arguments:
+                values: ['debit', 'credit']
       - name: sec_code
         tests:
           - accepted_values:
-              values: ['PPD', 'CCD', 'WEB', 'TEL']
+              arguments:
+                values: ['PPD', 'CCD', 'WEB', 'TEL']
 
   - name: stg_wire
     description: "Cleaned wire transactions."
@@ -50,7 +57,8 @@ models:
       - name: wire_type
         tests:
           - accepted_values:
-              values: ['domestic', 'international']
+              arguments:
+                values: ['domestic', 'international']
 
   - name: stg_rtp
     description: "Cleaned instant (RTP) transactions."
@@ -69,4 +77,5 @@ models:
       - name: entry_mode
         tests:
           - accepted_values:
-              values: ['chip', 'swipe', 'contactless', 'card_not_present']
+              arguments:
+                values: ['chip', 'swipe', 'contactless', 'card_not_present']

@@ -1,5 +1,6 @@
 version: 2
 
+# Newer dbt nests a generic test's inputs under `arguments:` (see _staging.yml note).
 models:
   - name: fct_transactions
     description: >
@@ -14,20 +15,23 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['ACH', 'WIRE', 'RTP', 'CARD']
+              arguments:
+                values: ['ACH', 'WIRE', 'RTP', 'CARD']
       - name: partner_bank_id
         tests: [not_null]
       - name: risk_score
         tests:
           - not_null
           - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 100
+              arguments:
+                min_value: 0
+                max_value: 100
       - name: risk_band
         tests:
           - not_null
           - accepted_values:
-              values: ['High', 'Medium', 'Low']
+              arguments:
+                values: ['High', 'Medium', 'Low']
       - name: is_flagged
         tests: [not_null]
       - name: is_fraud
@@ -46,22 +50,26 @@ models:
         tests:
           - not_null
           - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
+              arguments:
+                min_value: 0
+                max_value: 1
       - name: detection_recall
         description: "true_positives / fraud_count (share of fraud the score caught)."
         tests:
           - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
+              arguments:
+                min_value: 0
+                max_value: 1
       - name: detection_precision
         description: "true_positives / flagged_count (share of alerts that were real)."
         tests:
           - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 1
-    # This composite key should be unique -- a good "grain test" that catches
-    # accidental fan-out (duplicate rows) in the aggregation.
+              arguments:
+                min_value: 0
+                max_value: 1
+    # Grain test: this composite key should be unique -- catches accidental
+    # fan-out (duplicate rows) in the aggregation.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: [txn_date, partner_bank_id, rail_type]
+          arguments:
+            combination_of_columns: [txn_date, partner_bank_id, rail_type]
