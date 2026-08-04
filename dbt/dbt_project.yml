@@ -18,11 +18,14 @@ clean-targets:
   - "dbt_packages"
 
 # Materialization strategy per layer (medallion):
-#   staging (silver) -> views  (lightweight, always fresh)
-#   marts   (gold)   -> tables (materialized for fast reads / BI)
+#   staging      (silver) -> views  (lightweight, always fresh)
+#   intermediate         -> views  (per-rail scoring; kept queryable for drill-down)
+#   marts        (gold)   -> tables (materialized for fast reads / BI)
 models:
   fraud_pipeline:
     staging:
+      +materialized: view
+    intermediate:
       +materialized: view
     marts:
       +materialized: table

@@ -1,0 +1,9 @@
+# Third-party dbt packages. Run `dbt deps` (dbt Cloud does this automatically on
+# each job) to install them into dbt_packages/ before building.
+#
+# dbt_utils gives us extra tests used in the marts/intermediate layers, e.g.
+# accepted_range (0-100 scores, 0-1 rates) and unique_combination_of_columns
+# (grain test on the daily scorecard).
+packages:
+  - package: dbt-labs/dbt_utils
+    version: [">=1.1.0", "<2.0.0"]
