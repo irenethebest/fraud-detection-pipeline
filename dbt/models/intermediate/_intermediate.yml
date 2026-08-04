@@ -1,0 +1,54 @@
+version: 2
+
+# The four per-rail scoring models share the same score contract: every row gets
+# a risk_score, and it must land in the valid 0-100 range. dbt_utils.accepted_range
+# enforces that automatically. (Requires the dbt_utils package -- see packages.yml.)
+models:
+  - name: int_ach_scored
+    description: "ACH transactions with a rule-based fraud risk_score (0-100)."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: risk_score
+        description: "Observable-signal risk score, 0-100."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: int_wire_scored
+    description: "Wire transactions with a rule-based fraud risk_score (0-100)."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: risk_score
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: int_rtp_scored
+    description: "RTP transactions with a rule-based fraud risk_score (0-100)."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: risk_score
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: int_card_scored
+    description: "Card transactions with a rule-based fraud risk_score (0-100)."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: risk_score
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
